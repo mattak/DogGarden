@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class TileMatchingManager : SingletonMonoBehaviourFast<TileMatchingManager> {
 	private TileBehaviour[] tiles;
 	private const float pixelByUnit = 100.0f;
-	private const float tileSearchDistance = 400.0f / pixelByUnit; // double of tile size
+	private const float nearestTileDistance = 2.23606798f * 1.01f; // sqrt((100/pixelperunit)^2+(200/pixelperunit)^2) * <a little offset>
 
 	// Use this for initialization
 	void Start () {
@@ -13,7 +13,7 @@ public class TileMatchingManager : SingletonMonoBehaviourFast<TileMatchingManage
 	}
 
 	public bool ClearMatchingTiles(TileBehaviour tile) {
-		IList matchedTiles = SearchNearestSameTiles (tile);
+		HashSet<TileBehaviour> matchedTiles = SearchNearestSameTiles (tile);
 
 		if (matchedTiles.Count >= 2) {
 			foreach (TileBehaviour matchedTile in matchedTiles) {
@@ -25,25 +25,39 @@ public class TileMatchingManager : SingletonMonoBehaviourFast<TileMatchingManage
 		return false;
 	}
 
-	List<TileBehaviour> SearchNearestSameTiles(TileBehaviour tile) {
-		int count = 0;
-		List<TileBehaviour> list = new List<TileBehaviour> ();
-		foreach (TileBehaviour checkTile in SearchTilesInRange (tile, tileSearchDistance)) {
-			if (tile.IsSameElementImage(checkTile)) {
-				count++;
-				list.Add (checkTile);
+	HashSet<TileBehaviour> SearchNearestSameTiles(TileBehaviour tile) {
+		HashSet<TileBehaviour> sameTiles = SearchSameTiles (tile, new HashSet<TileBehaviour>(tiles));
+		HashSet<TileBehaviour> resultTiles = new HashSet<TileBehaviour>();
+
+		// FIXME: it's not optimized.
+		foreach (TileBehaviour checkTile in sameTiles) {
+			if (IsRangeOfDistance(tile.gameObject, checkTile.gameObject, nearestTileDistance)) {
+				resultTiles.Add (checkTile);
+				HashSet<TileBehaviour> nearTiles = SearchTilesInRange (checkTile, sameTiles, nearestTileDistance);
+				resultTiles.UnionWith(nearTiles);
 			}
 		}
 
+		return resultTiles;
+	}
+
+	HashSet<TileBehaviour> SearchTilesInRange(TileBehaviour tile, HashSet<TileBehaviour> tileSet, float distance) {
+		HashSet<TileBehaviour> list = new HashSet<TileBehaviour> ();
+		foreach (TileBehaviour checkTile in tileSet) {
+			if (Object.ReferenceEquals(checkTile,tile)) { continue; }
+			if (IsRangeOfDistance(tile.gameObject, checkTile.gameObject, distance)) {
+				list.Add(checkTile);
+			}
+		}
 		return list;
 	}
 
-	List<TileBehaviour> SearchTilesInRange(TileBehaviour tile, float distance) {
-		List<TileBehaviour> list = new List<TileBehaviour> ();
-		for (int i = 0; i < tiles.Length; i++) {
-			if (Object.ReferenceEquals(tiles[i],tile)) { continue; }
-			if (IsRangeOfDistance(tile.gameObject, tiles[i].gameObject, distance)) {
-				list.Add(tiles[i]);
+	HashSet<TileBehaviour> SearchSameTiles(TileBehaviour tile, HashSet<TileBehaviour> tileSet) {
+		HashSet<TileBehaviour> list = new HashSet<TileBehaviour>();
+		foreach (TileBehaviour checkTile in tileSet) {
+			if (Object.ReferenceEquals(checkTile,tile)) { continue; }
+			if (tile.IsSameElementImage(checkTile)) {
+				list.Add (checkTile);
 			}
 		}
 		return list;
