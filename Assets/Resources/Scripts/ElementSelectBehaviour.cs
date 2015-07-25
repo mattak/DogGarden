@@ -11,9 +11,12 @@ public class ElementSelectBehaviour : SingletonMonoBehaviourFast<ElementSelectBe
 
 	// Use this for initialization
 	void Start () {
+		// setup elementImages
 		images = new Image[buttons.Length];
 		for (int i = 0; i < buttons.Length; i++) {
-			images[i] = buttons[i].GetComponent<Image>() as Image;
+			images[i] = buttons[i].GetComponent<Image>();
+			Image elementImage = buttons[i].transform.GetChild(0).GetComponent<Image>();
+			SetElementImageByRandom(elementImage);
 		}
 
 		buttons[0].OnClickAsObservable ()
@@ -49,13 +52,16 @@ public class ElementSelectBehaviour : SingletonMonoBehaviourFast<ElementSelectBe
 		}
 	}
 
+	void SetElementImageByRandom(Image image) {
+		image.sprite = ElementGeneratorBehaviour.Instance.GetDogSpriteByRandom ();
+	}
+
 	public Image GetSelectedImage() {
 		return selectedImage;
 	}
 
 	public void UpdateElement(Image elementImage) {
-		// TODO: change next image source.
-		elementImage.sprite = Resources.Load<Sprite> ("Sprites/dogs/brown");
+		SetElementImageByRandom (elementImage);
 		SetTileImageNotSelected (images);
 	}
 }
