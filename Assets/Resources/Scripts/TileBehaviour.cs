@@ -7,27 +7,50 @@ public class TileBehaviour : MonoBehaviour {
 	private Button button;
 	private Image tileImage;
 	private Image elementImage;
+	private int rank;
 
 	// Use this for initialization
 	void Start () {
 		button = this.gameObject.GetComponent<Button> ();
 		tileImage = this.gameObject.GetComponent<Image> ();
 		elementImage = this.gameObject.transform.GetChild (0).GetComponent<Image>();
+		rank = 0;
 
 		button.OnClickAsObservable().Subscribe(_ => {
-			Image selectedImage = ElementSelectBehaviour.Instance.GetSelectedImage ();
-
-			SetElementImage (selectedImage);
-			ElementSelectBehaviour.Instance.UpdateElement (selectedImage);
+			PutImage (ElementSelectBehaviour.Instance.GetSelectedImage ());
 		});
 	}
 
-	void SetElementImage(Image selectedImage) {
-		elementImage.sprite = selectedImage.sprite;
+	void PutImage(Image selectedImage) {
+		if (selectedImage != null) {
+			ElementSelectBehaviour.Instance.UpdateElement (selectedImage);
+			SetElementImage (selectedImage.sprite);
+
+			MatchAndJoinImages ();
+		}
+	}
+
+	void MatchAndJoinImages() {
+		// delay
+		if (TileMatchingManager.Instance.ClearMatchingTiles(this.GetComponent<TileBehaviour>())) {
+			UpdateRank ();
+			MatchAndJoinImages ();
+		}
+	}
+
+	void UpdateRank() {
+		this.rank = this.rank + 1;
+		Sprite sprite = ElementGeneratorBehaviour.Instance.GetDogSpriteByRank(this.rank);
+		SetElementImage (sprite);
+	}
+
+	void SetElementImage(Sprite sprite) {
+		elementImage.sprite = sprite;
 		elementImage.color = Color.white;
 	}
 
-	void UnSetElementImage() {
+	public void UnSetElementImage() {
+		this.rank = 0;
 		elementImage.sprite = null;
 		elementImage.color = Color.clear;
 	}
@@ -40,5 +63,9 @@ public class TileBehaviour : MonoBehaviour {
 	void UnSetTileImage() {
 		tileImage.sprite = null;
 		tileImage.color = Color.clear;
+	}
+
+	public bool IsSameElementImage(TileBehaviour target) {
+		return elementImage.sprite.Equals (target.elementImage.sprite);
 	}
 }
