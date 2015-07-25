@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CameraBehaviour : MonoBehaviour {
-	public Camera camera;
-	
+public class CameraBehaviour : MonoBehaviour {	
 	// Use this for initialization
 	void Awake() {
 		float aspect = (float)Screen.height / Screen.width;
