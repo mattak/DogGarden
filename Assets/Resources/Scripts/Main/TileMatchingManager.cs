@@ -67,4 +67,13 @@ public class TileMatchingManager : SingletonMonoBehaviourFast<TileMatchingManage
 		float dist = Vector3.Distance (object1.transform.position, object2.transform.position);
 		return dist <= maxDistance;
 	}
+
+	public bool IsFullTiles() {
+		foreach (TileBehaviour tile in tiles) {
+			if (tile.IsEmptyTile()) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

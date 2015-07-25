@@ -27,6 +27,10 @@ public class TileBehaviour : MonoBehaviour {
 			SetElementImage (selectedImage.sprite);
 
 			MatchAndJoinImages ();
+
+			if (TileMatchingManager.Instance.IsFullTiles()) {
+				Application.LoadLevel ("Over");
+			}
 		}
 	}
 
@@ -67,5 +71,9 @@ public class TileBehaviour : MonoBehaviour {
 
 	public bool IsSameElementImage(TileBehaviour target) {
 		return elementImage.sprite.Equals (target.elementImage.sprite);
+	}
+
+	public bool IsEmptyTile() {
+		return elementImage.sprite == null;
 	}
 }
