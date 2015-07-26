@@ -17,7 +17,7 @@ public class TileMatchingManager : SingletonMonoBehaviourFast<TileMatchingManage
 
 		if (matchedTiles.Count >= 2) {
 			foreach (TileBehaviour matchedTile in matchedTiles) {
-				matchedTile.UnSetElementImage ();
+				matchedTile.UnSetElement ();
 			}
 			return true;
 		}
@@ -56,7 +56,7 @@ public class TileMatchingManager : SingletonMonoBehaviourFast<TileMatchingManage
 		HashSet<TileBehaviour> list = new HashSet<TileBehaviour>();
 		foreach (TileBehaviour checkTile in tileSet) {
 			if (Object.ReferenceEquals(checkTile,tile)) { continue; }
-			if (tile.IsSameElementImage(checkTile)) {
+			if (tile.IsSameElementTile(checkTile)) {
 				list.Add (checkTile);
 			}
 		}

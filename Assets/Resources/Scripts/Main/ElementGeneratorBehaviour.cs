@@ -39,4 +39,9 @@ public class ElementGeneratorBehaviour : SingletonMonoBehaviourFast<ElementGener
 		int rank = Random.Range (0, rankLimit);
 		return GetDogSpriteByRank(rank);
 	}
+
+	public int GetDogRankByRandom() {
+		int rankLimit = (currentMaxRank > 3) ? 3 : (currentMaxRank <= 0) ? 0 : currentMaxRank -1;
+		return Random.Range (0, rankLimit);
+	}
 }

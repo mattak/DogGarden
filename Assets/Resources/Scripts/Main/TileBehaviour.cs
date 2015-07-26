@@ -6,25 +6,23 @@ using UniRx;
 public class TileBehaviour : MonoBehaviour {
 	private Button button;
 	private Image tileImage;
-	private Image elementImage;
-	private int rank;
+	private ElementBehaviour element;
 
 	// Use this for initialization
 	void Start () {
 		button = this.gameObject.GetComponent<Button> ();
 		tileImage = this.gameObject.GetComponent<Image> ();
-		elementImage = this.gameObject.transform.GetChild (0).GetComponent<Image>();
-		rank = 0;
+		element = this.gameObject.transform.GetChild (0).GetComponent<ElementBehaviour>();
 
 		button.OnClickAsObservable().Subscribe(_ => {
-			PutImage (ElementSelectBehaviour.Instance.GetSelectedImage ());
+			PutElement (ElementSelectBehaviour.Instance.GetSelectedElement ());
 		});
 	}
 
-	void PutImage(Image selectedImage) {
-		if (selectedImage != null) {
-			ElementSelectBehaviour.Instance.UpdateElement (selectedImage);
-			SetElementImage (selectedImage.sprite);
+	void PutElement(ElementBehaviour element) {
+		if (element != null) {
+			ElementSelectBehaviour.Instance.UpdateElements();
+			CopyElement (element);
 
 			MatchAndJoinImages ();
 
@@ -37,26 +35,14 @@ public class TileBehaviour : MonoBehaviour {
 	void MatchAndJoinImages() {
 		// delay
 		if (TileMatchingManager.Instance.ClearMatchingTiles(this.GetComponent<TileBehaviour>())) {
-			UpdateRank ();
+			RankUpElement ();
 			MatchAndJoinImages ();
 		}
 	}
 
-	void UpdateRank() {
-		this.rank = this.rank + 1;
-		Sprite sprite = ElementGeneratorBehaviour.Instance.GetDogSpriteByRank(this.rank);
-		SetElementImage (sprite);
-	}
-
-	void SetElementImage(Sprite sprite) {
-		elementImage.sprite = sprite;
-		elementImage.color = Color.white;
-	}
-
-	public void UnSetElementImage() {
-		this.rank = 0;
-		elementImage.sprite = null;
-		elementImage.color = Color.clear;
+	void RankUpElement() {
+		this.element.rank.Value = element.rank.Value + 1;
+		ScoreManager.Instance.AddScoreByRank(this.element.rank.Value);
 	}
 
 	void SetTileImage() {
@@ -69,11 +55,20 @@ public class TileBehaviour : MonoBehaviour {
 		tileImage.color = Color.clear;
 	}
 
-	public bool IsSameElementImage(TileBehaviour target) {
-		return elementImage.sprite.Equals (target.elementImage.sprite);
+	void CopyElement (ElementBehaviour source) {
+		this.element.rank.Value = source.rank.Value;
+		ScoreManager.Instance.AddScoreByRank(this.element.rank.Value);
+	}
+
+	public void UnSetElement() {
+		this.element.Clear ();
+	}
+
+	public bool IsSameElementTile(TileBehaviour tile) {
+		return this.element.IsSameElementImage (tile.element);
 	}
 
 	public bool IsEmptyTile() {
-		return elementImage.sprite == null;
+		return this.element.IsEmpty ();
 	}
 }

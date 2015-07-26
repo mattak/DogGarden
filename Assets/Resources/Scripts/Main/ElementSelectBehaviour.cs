@@ -6,36 +6,42 @@ using UnityEngine.UI;
 
 public class ElementSelectBehaviour : SingletonMonoBehaviourFast<ElementSelectBehaviour> {
 	public Button[] buttons;
-	private Image[] images;
-	private Image selectedImage = null;
+	private Image[] tileImages;
+	private ElementBehaviour[] elements;
+	private ElementBehaviour selectedElement = null;
+	private int selectedIndex = -1;
 
 	// Use this for initialization
 	void Start () {
 		// setup elementImages
-		images = new Image[buttons.Length];
+		elements = new ElementBehaviour[buttons.Length];
+		tileImages = new Image[buttons.Length];
+
 		for (int i = 0; i < buttons.Length; i++) {
-			images[i] = buttons[i].GetComponent<Image>();
-			Image elementImage = buttons[i].transform.GetChild(0).GetComponent<Image>();
-			SetElementImageByRandom(elementImage);
+			tileImages[i] = buttons[i].GetComponent<Image>();
+			elements[i] = buttons[i].transform.GetChild(0).GetComponent<ElementBehaviour>();
+			elements[i].SetRankByRandom();
 		}
 
 		buttons[0].OnClickAsObservable ()
 			.Subscribe(thisUnit => {
-				SetTileImageSelected(images, 0);
-					selectedImage = buttons[0].transform.GetChild (0).GetComponent<Image>();
-				});
+				SetTileImageSelected(tileImages, 0);
+				selectedElement = elements[0];
+				selectedIndex = 0;
+			});
 		
 		buttons[1].OnClickAsObservable ()
 			.Subscribe(thisUnit => {
-				SetTileImageSelected(images, 1);
-				selectedImage = buttons[1].transform.GetChild (0).GetComponent<Image>();
+				SetTileImageSelected(tileImages, 1);
+				selectedElement = elements[1];
+				selectedIndex = 1;
 			});
 
-		
 		buttons[2].OnClickAsObservable ()
 			.Subscribe(thisUnit => {
-				SetTileImageSelected(images, 2);
-				selectedImage = buttons[2].transform.GetChild (0).GetComponent<Image>();
+				SetTileImageSelected(tileImages, 2);
+				selectedElement = elements[2];
+				selectedIndex = 2;
 			});
 	}
 
@@ -52,16 +58,17 @@ public class ElementSelectBehaviour : SingletonMonoBehaviourFast<ElementSelectBe
 		}
 	}
 
-	void SetElementImageByRandom(Image image) {
-		image.sprite = ElementGeneratorBehaviour.Instance.GetDogSpriteByRandom ();
+	public void UpdateElements() {
+		if (selectedIndex < 0 || selectedIndex >= buttons.Length) {
+			SetTileImageNotSelected (tileImages);
+			return;
+		}
+
+		elements[selectedIndex].SetRankByRandom ();
+		SetTileImageSelected (tileImages, selectedIndex);
 	}
 
-	public Image GetSelectedImage() {
-		return selectedImage;
-	}
-
-	public void UpdateElement(Image elementImage) {
-		SetElementImageByRandom (elementImage);
-		SetTileImageNotSelected (images);
+	public ElementBehaviour GetSelectedElement() {
+		return selectedElement;
 	}
 }
