@@ -35,13 +35,21 @@ public class ElementGeneratorBehaviour : SingletonMonoBehaviourFast<ElementGener
 	}
 
 	public Sprite GetDogSpriteByRandom() {
-		int rankLimit = (currentMaxRank > 3) ? 3 : (currentMaxRank <= 0) ? 0 : currentMaxRank -1;
-		int rank = Random.Range (0, rankLimit);
+		int rank = GetDogRankByRandom ();
 		return GetDogSpriteByRank(rank);
 	}
 
 	public int GetDogRankByRandom() {
-		int rankLimit = (currentMaxRank > 3) ? 3 : (currentMaxRank <= 0) ? 0 : currentMaxRank -1;
-		return Random.Range (0, rankLimit);
+		int rankLimit = (currentMaxRank > 4) ? 4 : (currentMaxRank <= 0) ? 1 : currentMaxRank;
+		int rand = Random.Range (0, rankLimit);
+		Debug.Log ("generate by random : " + rand + " by " + rankLimit);
+		return rand;
+	}
+
+	public bool UpdateMaxRank(int rank) {
+		if (rank < 0) { return false; }
+		this.currentMaxRank = rank;
+		Debug.Log ("update max rank = " + currentMaxRank);
+		return true;
 	}
 }

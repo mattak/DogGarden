@@ -21,7 +21,7 @@ public class TileBehaviour : MonoBehaviour {
 
 	void PutElement(ElementBehaviour element) {
 		if (element != null) {
-			ElementSelectBehaviour.Instance.UpdateElements();
+			Debug.Log ("copyed rank is " + element.rank.Value);
 			CopyElement (element);
 
 			MatchAndJoinImages ();
@@ -29,6 +29,8 @@ public class TileBehaviour : MonoBehaviour {
 			if (TileMatchingManager.Instance.IsFullTiles()) {
 				Application.LoadLevel ("Over");
 			}
+
+			ElementSelectBehaviour.Instance.UpdateElements();
 		}
 	}
 
@@ -43,6 +45,7 @@ public class TileBehaviour : MonoBehaviour {
 	void RankUpElement() {
 		this.element.rank.Value = element.rank.Value + 1;
 		ScoreManager.Instance.AddScoreByRank(this.element.rank.Value);
+		ElementGeneratorBehaviour.Instance.UpdateMaxRank (this.element.rank.Value);
 	}
 
 	void SetTileImage() {
