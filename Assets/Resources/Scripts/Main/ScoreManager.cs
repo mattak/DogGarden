@@ -64,5 +64,16 @@ public class ScoreManager : SingletonMonoBehaviourFast<ScoreManager> {
 		}
 
 		score.Value += scoreTable[rank];
+		SaveResultScore (score.Value);
+	}
+
+	public long LoadResultScore() {
+		string scoreString = PlayerPrefs.GetString ("result_score", "0");
+		return long.Parse (scoreString);
+	}
+
+	public void SaveResultScore(long value) {
+		string scoreString = value.ToString ();
+		PlayerPrefs.SetString ("result_score", scoreString);
 	}
 }
